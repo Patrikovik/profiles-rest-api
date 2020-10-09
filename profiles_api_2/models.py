@@ -11,24 +11,27 @@ class UserProfileManager(BaseUserManager):
     def create_user(self, email, name, password=None):
         """Create a new user profile"""
         if not email:
-            raise ValueError('Users must have an email adress')
+            raise ValueError('Users must have an email address')
 
         email = self.normalize_email(email)
-        user = self.model(email=email,name=name)
-        user.set_password(password) #Django encrypts passwords with this fucntion
-        user.Save(using=self._db)
+        user = self.model(email=email, name=name,)
+
+        user.set_password(password)
+        user.save(using=self._db)
 
         return user
 
-    def create_superuser(self,email,name,password):
+    def create_superuser(self, email, name, password):
         """Create and save a new superuser with given details"""
-        user = self.create_user(email,name,password)
+        user = self.create_user(email, name, password)
 
         user.is_superuser = True
         user.is_staff = True
-        user.save
+        user.save(using=self._db)
 
-class UserProfile(AbstractBaseUser,PermissionsMixin):
+        return user
+
+class UserProfile(AbstractBaseUser, PermissionsMixin):
     """Database model for users in the system"""
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
@@ -36,7 +39,6 @@ class UserProfile(AbstractBaseUser,PermissionsMixin):
     is_staff = models.BooleanField(default=False)
 
     objects = UserProfileManager()
-
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
